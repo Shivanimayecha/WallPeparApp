@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/privacy"
+            android:title="Privacy Policy"
+            android:visible="true"
+            android:icon="@drawable/privacypolicy"/>
+        <item
+            android:id="@+id/help"
+            android:title="Help"
+            android:visible="true"
+            android:icon="@drawable/help1"/>
+        <item
+            android:id="@+id/apps"
+            android:title="MoreApps"
+            android:visible="true"
+            android:icon="@drawable/profiles1"/>
+        <item
+            android:id="@+id/rating"
+            android:visible="true"
+            android:title="Rating"
+            android:icon="@drawable/rating1"/>
+
+        <item
+            android:id="@+id/clrcache"
+            android:visible="true"
+            android:title="Clear Cache"
+            android:icon="@drawable/smartphone"/>
+    </group>
+</menu>

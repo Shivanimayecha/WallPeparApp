@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/rl1"
+    android:layout_margin="5dp"
+    android:paddingBottom="8dp">
+
+
+    <ImageView
+        android:id="@+id/appIcon"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:scaleType="fitXY"
+        android:src="@mipmap/ic_launcher"/>
+
+    <TextView
+        android:id="@+id/appName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="AppName"
+        android:layout_alignTop="@+id/appIcon"
+        android:layout_toRightOf="@+id/appIcon"
+        android:layout_marginLeft="18dp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorAccent"
+        android:layout_toEndOf="@+id/appIcon" />
+
+    <Button
+        android:layout_width="90dp"
+        android:layout_height="30sp"
+        android:id="@+id/btn_install"
+        android:text="INSTALL"
+        android:textSize="15sp"
+        android:layout_below="@+id/appName"
+        android:layout_marginLeft="18dp"
+        android:layout_marginTop="30dp"
+        android:layout_alignTop="@+id/appIcon"
+        android:layout_toRightOf="@+id/appIcon"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/White" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorPrimary"
+        android:layout_below="@+id/appIcon"
+        android:layout_alignLeft="@+id/appIcon"
+        android:layout_marginTop="20dp" />
+
+</RelativeLayout>
