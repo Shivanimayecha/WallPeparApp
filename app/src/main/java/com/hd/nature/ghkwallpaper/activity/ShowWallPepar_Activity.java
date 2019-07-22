@@ -5,6 +5,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
@@ -17,10 +18,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.hd.nature.ghkwallpaper.R;
 import com.hd.nature.ghkwallpaper.adapter.WallPeparsAdapter;
+import com.hd.nature.ghkwallpaper.comman.GlobalApplication;
 import com.hd.nature.ghkwallpaper.comman.NetworkConnection;
 import com.hd.nature.ghkwallpaper.data_models.WallPepars_Model;
 import com.hd.nature.ghkwallpaper.retrofit.ApiService;
@@ -107,9 +110,7 @@ public class ShowWallPepar_Activity extends AppCompatActivity {
                         if (response.body() != null) {
                             callWallPaperAPI(response.body(), "");
                         }
-
                     }
-
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
                         Log.e(TAG, "onFailure: ");
@@ -122,19 +123,40 @@ public class ShowWallPepar_Activity extends AppCompatActivity {
 
         } else {
             Toast.makeText(activity, "Please check your network connection", Toast.LENGTH_SHORT).show();
-
         }
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            new ImageSave().execute();
+
+                if (!GlobalApplication.getInstance().requestNewInterstitial()) {
+
+                } else {
+                    GlobalApplication.getInstance().mInterstitialAd.setAdListener(new AdListener() {
+                        @Override
+                        public void onAdClosed() {
+                            super.onAdClosed();
+                            GlobalApplication.getInstance().mInterstitialAd.setAdListener(null);
+                            GlobalApplication.getInstance().mInterstitialAd = null;
+                            GlobalApplication.getInstance().ins_adRequest = null;
+                            GlobalApplication.getInstance().LoadAds();
+                        }
+                        @Override
+                        public void onAdFailedToLoad(int i) {
+                            super.onAdFailedToLoad(i);
+                        }
+                        @Override
+                        public void onAdLoaded() {
+                            super.onAdLoaded();
+                        }
+                    });
+                }
+                new ImageSave().execute();
             }
         });
     }
 
     private void callWallPaperAPI(String body, String s) {
-
         try {
 
             wallPepars_modelArrayList.clear();
@@ -162,25 +184,24 @@ public class ShowWallPepar_Activity extends AppCompatActivity {
 
     }
 
-
-    private class ImageSave extends AsyncTask<Void,Void,Void> {
+    private class ImageSave extends AsyncTask<Void, Void, Void> {
 
         Bitmap mbitmap;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            onProgressBar ();
-            Log.e (TAG, "onPreExecute: ");
+            onProgressBar();
+            Log.e(TAG, "onPreExecute: ");
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            getPhotos ();
-            File file = new File (Environment.getExternalStorageDirectory ().getPath () + File.separator + "WallPepar");
+            getPhotos();
+            File file = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "WallPepar");
 
 
-            if (!file.exists () && !file.mkdirs ()) ;
+            if (!file.exists() && !file.mkdirs()) ;
             /*{
                 Toast.makeText ( getApplicationContext (), "Don't Have Folder", Toast.LENGTH_SHORT ).show ();
                 return null;
@@ -189,23 +210,23 @@ public class ShowWallPepar_Activity extends AppCompatActivity {
             }*/
 
 
-            String simpleDateFormat = new SimpleDateFormat("yyyymmsshhmmss").format (new Date());
+            String simpleDateFormat = new SimpleDateFormat("yyyymmsshhmmss").format(new Date());
 
             mbitmap = bitmap;
             try {
                 if (mbitmap != null) {
-                    File new_file = new File (file, simpleDateFormat + ".jpeg");
+                    File new_file = new File(file, simpleDateFormat + ".jpeg");
 
-                    if (!new_file.exists ())
-                        new_file.createNewFile ();
+                    if (!new_file.exists())
+                        new_file.createNewFile();
 
                     FileOutputStream fileOutputStream = null;
                     try {
-                        fileOutputStream = new FileOutputStream (new_file);
-                        mbitmap.compress (Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-                        fileOutputStream.close ();
-                        MediaScannerConnection.scanFile (getApplicationContext (), new String[]{new_file.getAbsolutePath ()},
-                                null, new MediaScannerConnection.MediaScannerConnectionClient () {
+                        fileOutputStream = new FileOutputStream(new_file);
+                        mbitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
+                        fileOutputStream.close();
+                        MediaScannerConnection.scanFile(getApplicationContext(), new String[]{new_file.getAbsolutePath()},
+                                null, new MediaScannerConnection.MediaScannerConnectionClient() {
                                     @Override
                                     public void onMediaScannerConnected() {
                                     }
@@ -216,86 +237,82 @@ public class ShowWallPepar_Activity extends AppCompatActivity {
                                 });
 
                     } catch (FileNotFoundException e) {
-                        e.printStackTrace ();
+                        e.printStackTrace();
                     } finally {
                         try {
                             if (fileOutputStream != null)
-                                fileOutputStream.flush ();
-                            fileOutputStream.close ();
+                                fileOutputStream.flush();
+                            fileOutputStream.close();
                         } catch (IOException e) {
-                            e.printStackTrace ();
+                            e.printStackTrace();
                         }
                     }
                 } else {
-                    Log.e ("TAG", "Not Saved Image---->");
+                    Log.e("TAG", "Not Saved Image---->");
                 }
 
             } catch (Exception e) {
-                e.printStackTrace ();
+                e.printStackTrace();
             }
             return null;
         }
 
-
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            hideProgressBar ();
-            Toast.makeText (ShowWallPepar_Activity.this, "Image saved Successfully..Check Your Gallery !", Toast.LENGTH_SHORT).show ();
+            hideProgressBar();
+            Toast.makeText(ShowWallPepar_Activity.this, "Image saved Successfully..Check Your Gallery !", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void getPhotos() {
-        String url = wallPepars_modelArrayList.get (viewPager.getCurrentItem ()).getImage ();
-        bitmap = getBitmapFromURL (url);
+        String url = wallPepars_modelArrayList.get(viewPager.getCurrentItem()).getImage();
+        bitmap = getBitmapFromURL(url);
     }
 
     private Bitmap getBitmapFromURL(String src) {
 
         try {
-            URL url = new URL (src);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection ();
-            connection.setDoInput (true);
-            connection.connect ();
-            InputStream input = connection.getInputStream ();
-            Bitmap myBitmap = BitmapFactory.decodeStream (input);
+            URL url = new URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
             return myBitmap;
         } catch (IOException e) {
-            e.printStackTrace ();
+            e.printStackTrace();
             return null;
         }
     }
 
     private void onProgressBar() {
-        progressDialog = new ProgressDialog (ShowWallPepar_Activity.this);
-        progressDialog.setMessage ("Downloading...");
-        progressDialog.setIndeterminate (false);
-        progressDialog.setCancelable (false);
-        progressDialog.setCanceledOnTouchOutside (false);
-        progressDialog.show ();
+        progressDialog = new ProgressDialog(ShowWallPepar_Activity.this);
+        progressDialog.setMessage("Downloading...");
+        progressDialog.setIndeterminate(false);
+        progressDialog.setCancelable(false);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
     }
-
 
     private void hideProgressBar() {
         try {
-            if (progressDialog != null && progressDialog.isShowing ()) {
-                progressDialog.dismiss ();
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
             }
         } catch (IllegalArgumentException e) {
-            e.printStackTrace ();
+            e.printStackTrace();
         } catch (Exception e) {
-            e.printStackTrace ();
+            e.printStackTrace();
         } finally {
             progressDialog = null;
         }
     }
 
-
     @Override
     protected void onPause() {
 
-        if(adView!=null)
-        {
+        if (adView != null) {
             adView.pause();
         }
         super.onPause();
@@ -304,8 +321,7 @@ public class ShowWallPepar_Activity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(adView!=null)
-        {
+        if (adView != null) {
             adView.resume();
         }
     }
@@ -313,8 +329,7 @@ public class ShowWallPepar_Activity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
 
-        if(adView!=null)
-        {
+        if (adView != null) {
             adView.destroy();
         }
         super.onDestroy();

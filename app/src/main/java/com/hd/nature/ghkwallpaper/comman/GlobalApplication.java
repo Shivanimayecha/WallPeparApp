@@ -50,7 +50,7 @@ public class GlobalApplication extends MultiDexApplication {
                     .addTestDevice("5CE992DB43E8F2B50F7D2201A724526D")
                     .addTestDevice("6E5543AE954EAD6702405BFCCC34C9A2")
                     .addTestDevice("28373E4CC308EDBD5C5D39795CD4956A") //samsung
-                    .addTestDevice("79E8DED973BDF7477739501E228D88E1") //samdung max|
+                    .addTestDevice("79E8DED973BDF7477739501E228D88E1") //samsung max|
                     .addTestDevice("879B80CCA184B787248F4CD69D349258") //vivo
                     .build();
 

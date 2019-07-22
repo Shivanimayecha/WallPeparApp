@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     Activity activity;
     private AdView adView;
     AdRequest adRequest;
-    InterstitialAd interstitialAd;
+    //InterstitialAd interstitialAd;
 
 
     ArrayList<categoriesModel> categoriesModelArrayList = new ArrayList<>();
@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
         findViews();
         initViews();
         initNavigationDrawer();
-
     }
 
     private void findViews() {
@@ -148,23 +147,6 @@ public class MainActivity extends AppCompatActivity {
 
         adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
-
-
-
-
-/*
-        recyclerView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                private void showInterstitial()
-            {
-                    if (mInterstitialAd.isLoaded()) {
-                        mInterstitialAd.show();
-                    }
-                }
-            }
-        });
-*/
         if (NetworkConnection.isNetworkAvailable(activity)) {
 
             try {
@@ -184,7 +166,6 @@ public class MainActivity extends AppCompatActivity {
                             //showSomethingwentWrong();
                         }
                     }
-
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
                         //hideProgressbar();
@@ -221,8 +202,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
-
     @Override
     protected void onDestroy() {
         clearApplicationData();
@@ -278,7 +257,6 @@ public class MainActivity extends AppCompatActivity {
         {
             adView.resume();
         }*/
-
     }
     public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ViewHolder> {
 
@@ -290,8 +268,6 @@ public class MainActivity extends AppCompatActivity {
             this.categoriesModelArrayList = categoriesModelArrayList;
             this.context = context;
         }
-
-
         @NonNull
         @Override
         public CategoriesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -302,14 +278,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
-            /*   TextView lblappname;
-               ImageView imgappicon;
-               RelativeLayout ryllayoutd;*/
+
             public ImageView catIamge;
             public TextView catName;
             public RelativeLayout relativeLayout;
-
-
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -318,7 +290,6 @@ public class MainActivity extends AppCompatActivity {
                 catName = itemView.findViewById(R.id.catName);
                 relativeLayout = itemView.findViewById(R.id.rl);
 
-
             }
         }
         @Override
@@ -326,8 +297,6 @@ public class MainActivity extends AppCompatActivity {
 
             Picasso.get().load(categoriesModelArrayList.get(position).getCategoryImage()).into(holder.catIamge);
             holder.catName.setText(categoriesModelArrayList.get(position).getCategories());
-
-
             holder.relativeLayout.setOnClickListener(new View.OnClickListener() {
 
                 @Override
@@ -339,7 +308,8 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra("cat_id", categoriesModelArrayList.get(position).getId());
                         context.startActivity(intent);
 
-                    } else {
+                    }
+                    else {
                         GlobalApplication.getInstance().mInterstitialAd.setAdListener(new AdListener() {
                             @Override
                             public void onAdClosed() {
@@ -366,16 +336,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
-
         @Override
-        public int getItemCount() {
-            return categoriesModelArrayList.size();
-        }
+        public int getItemCount() { return categoriesModelArrayList.size(); }
     }
-
-
-
-
-
-
 }
