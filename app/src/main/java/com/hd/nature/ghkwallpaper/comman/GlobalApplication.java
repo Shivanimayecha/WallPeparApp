@@ -11,8 +11,6 @@ import com.google.android.gms.ads.doubleclick.PublisherInterstitialAd;
 
 public class GlobalApplication extends MultiDexApplication {
 
-
-
     public PublisherInterstitialAd mInterstitialAd;
     public PublisherAdRequest ins_adRequest;
 

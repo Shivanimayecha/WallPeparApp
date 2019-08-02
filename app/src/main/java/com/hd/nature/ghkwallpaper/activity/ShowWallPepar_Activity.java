@@ -8,14 +8,21 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
@@ -28,6 +35,9 @@ import com.hd.nature.ghkwallpaper.comman.NetworkConnection;
 import com.hd.nature.ghkwallpaper.data_models.WallPepars_Model;
 import com.hd.nature.ghkwallpaper.retrofit.ApiService;
 import com.hd.nature.ghkwallpaper.retrofit.RetroClient;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,6 +48,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -48,7 +59,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ShowWallPepar_Activity extends AppCompatActivity {
+import static java.security.AccessController.getContext;
+
+public class ShowWallPepar_Activity extends Activity {
 
 
     String TAG = "TAG";
@@ -58,11 +71,13 @@ public class ShowWallPepar_Activity extends AppCompatActivity {
     Activity activity;
     WallPeparsAdapter wallPeparsAdapter;
     ArrayList<WallPepars_Model> wallPepars_modelArrayList = new ArrayList<>();
-    Button save;
+    ImageButton save,back,favorite;
+    ImageView share;
     Bitmap bitmap;
     ProgressDialog progressDialog;
     private AdView adView;
     AdRequest adRequest;
+
 
 
     @Override
@@ -80,7 +95,9 @@ public class ShowWallPepar_Activity extends AppCompatActivity {
 
     private void findViews() {
         viewPager = findViewById(R.id.viewPager);
-        save = findViewById(R.id.btn_save);
+        save = findViewById(R.id.btn_download);
+        back = findViewById(R.id.btn_back);
+        share = findViewById(R.id.btn_share);
         adView = findViewById(R.id.ad_View);
     }
 
@@ -125,9 +142,15 @@ public class ShowWallPepar_Activity extends AppCompatActivity {
             Toast.makeText(activity, "Please check your network connection", Toast.LENGTH_SHORT).show();
         }
 
+
+
+
+
+
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
 
                 if (!GlobalApplication.getInstance().requestNewInterstitial()) {
 
@@ -154,7 +177,78 @@ public class ShowWallPepar_Activity extends AppCompatActivity {
                 new ImageSave().execute();
             }
         });
+
+
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               // onBackPressed();
+
+                Intent intent = new Intent(ShowWallPepar_Activity.this,MainActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Bitmap bitmap =getBitmapFromView(viewPager);
+                try {
+                    File file = new File(ShowWallPepar_Activity.this.getExternalCacheDir(),"abc.png");
+                    FileOutputStream fOut = new FileOutputStream(file);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                    fOut.flush();
+                    fOut.close();
+                    file.setReadable(true, false);
+                    final Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                   // intent.putExtra(Intent.EXTRA_TEXT, movieName);
+                    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+                    intent.setType("image/png");
+                    startActivity(Intent.createChooser(intent, "Share image via"));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+             /*   Intent share = new Intent(Intent.ACTION_SEND);
+
+                // If you want to share a png image only, you can do:
+                // setType("image/png"); OR for jpeg: setType("image/jpeg");
+                share.setType("image/*");
+
+                // Make sure you put example png image named myImage.png in your
+                // directory
+                String imagePath = Environment.getExternalStorageDirectory()
+                        + "/myImage.png";
+
+                File imageFileToShare = new File(imagePath);
+
+                Uri uri = Uri.fromFile(imageFileToShare);
+                share.putExtra(Intent.EXTRA_STREAM, uri);
+
+                startActivity(Intent.createChooser(share, "Share Image!"));*/
+
+
+            }
+        });
     }
+
+    private Bitmap getBitmapFromView(ViewPager viewPager) {
+        Bitmap returnedBitmap = Bitmap.createBitmap(viewPager.getWidth(), viewPager.getHeight(),Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(returnedBitmap);
+        Drawable bgDrawable =viewPager.getBackground();
+        if (bgDrawable!=null) {
+            bgDrawable.draw(canvas);
+        }   else{
+            canvas.drawColor(Color.WHITE);
+        }
+        viewPager.draw(canvas);
+        return returnedBitmap;
+
+    }
+
 
     private void callWallPaperAPI(String body, String s) {
         try {
@@ -308,6 +402,14 @@ public class ShowWallPepar_Activity extends AppCompatActivity {
             progressDialog = null;
         }
     }
+
+  /*  @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish ();
+        Runtime.getRuntime ().gc ();
+        System.gc ();
+    }*/
 
     @Override
     protected void onPause() {

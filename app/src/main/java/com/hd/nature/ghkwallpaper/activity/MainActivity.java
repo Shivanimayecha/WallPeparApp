@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -66,9 +67,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         setContentView(R.layout.activity_main);
         activity = MainActivity.this;
-        toolbar = findViewById(R.id.toolbar);
+
         findViews();
         initViews();
         initNavigationDrawer();
@@ -76,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void findViews() {
 
+        toolbar = findViewById(R.id.toolbar);
         recyclerView = findViewById(R.id.recycler);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -92,25 +96,33 @@ public class MainActivity extends AppCompatActivity {
                 int id = menuItem.getItemId();
 
                 switch (id) {
-                    case R.id.privacy:
-                        Toast.makeText(getApplicationContext(), "Home", Toast.LENGTH_SHORT).show();
-                        drawerLayout.closeDrawers();
+                    case R.id.fvrt:
+                        Toast.makeText(getApplicationContext(), "Favorite", Toast.LENGTH_SHORT).show();
                         break;
-                    case R.id.help:
-                        Toast.makeText(getApplicationContext(), "Settings", Toast.LENGTH_SHORT).show();
+                    case R.id.privacyPolicy:
+                        Toast.makeText(getApplicationContext(), "Privacy Policy", Toast.LENGTH_SHORT).show();
                         break;
-                    case R.id.apps:
+                    case R.id.termcondition:
+                        Toast.makeText(getApplicationContext(), "Terms & Condition", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.moreApps:
+
                         Intent intent = new Intent(MainActivity.this, MoreAppsActivity.class);
                         startActivity(intent);
                         break;
-                    case R.id.rating:
-                        final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+
+                    //for rating
+                  /*      final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
                         try {
                             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
                         } catch (android.content.ActivityNotFoundException anfe) {
                             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
                         }
+                        break;*/
+                    case R.id.shareApp:
+                        Toast.makeText(getApplicationContext(), "Share App", Toast.LENGTH_SHORT).show();
                         break;
+
                     case R.id.clrcache:
                         clearApplicationData();
                         Toast.makeText(MainActivity.this, "Cache Data is clear !", Toast.LENGTH_SHORT).show();
@@ -166,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
                             //showSomethingwentWrong();
                         }
                     }
+
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
                         //hideProgressbar();
@@ -202,11 +215,11 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     @Override
     protected void onDestroy() {
         clearApplicationData();
-        if(adView!=null)
-        {
+        if (adView != null) {
             adView.destroy();
         }
         super.onDestroy();
@@ -243,8 +256,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
 
-        if(adView!=null)
-        {
+        if (adView != null) {
             adView.pause();
         }
         super.onPause();
@@ -258,6 +270,7 @@ public class MainActivity extends AppCompatActivity {
             adView.resume();
         }*/
     }
+
     public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ViewHolder> {
 
         private ArrayList<categoriesModel> categoriesModelArrayList;
@@ -268,6 +281,7 @@ public class MainActivity extends AppCompatActivity {
             this.categoriesModelArrayList = categoriesModelArrayList;
             this.context = context;
         }
+
         @NonNull
         @Override
         public CategoriesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -280,23 +294,24 @@ public class MainActivity extends AppCompatActivity {
         public class ViewHolder extends RecyclerView.ViewHolder {
 
             public ImageView catIamge;
-            public TextView catName;
+            //public TextView catName;
             public RelativeLayout relativeLayout;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
 
                 catIamge = itemView.findViewById(R.id.catImage);
-                catName = itemView.findViewById(R.id.catName);
+                //  catName = itemView.findViewById(R.id.catName);
                 relativeLayout = itemView.findViewById(R.id.rl);
 
             }
         }
-        @Override
-        public void onBindViewHolder(@NonNull CategoriesAdapter.ViewHolder holder, final int position) {
 
-            Picasso.get().load(categoriesModelArrayList.get(position).getCategoryImage()).into(holder.catIamge);
-            holder.catName.setText(categoriesModelArrayList.get(position).getCategories());
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+
+            Picasso.with(context).load(categoriesModelArrayList.get(position).getCategoryImage()).into(holder.catIamge);
+            //  holder.catName.setText(categoriesModelArrayList.get(position).getCategories());
             holder.relativeLayout.setOnClickListener(new View.OnClickListener() {
 
                 @Override
@@ -308,8 +323,7 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra("cat_id", categoriesModelArrayList.get(position).getId());
                         context.startActivity(intent);
 
-                    }
-                    else {
+                    } else {
                         GlobalApplication.getInstance().mInterstitialAd.setAdListener(new AdListener() {
                             @Override
                             public void onAdClosed() {
@@ -323,10 +337,12 @@ public class MainActivity extends AppCompatActivity {
                                 intent.putExtra("cat_id", categoriesModelArrayList.get(position).getId());
                                 context.startActivity(intent);
                             }
+
                             @Override
                             public void onAdFailedToLoad(int i) {
                                 super.onAdFailedToLoad(i);
                             }
+
                             @Override
                             public void onAdLoaded() {
                                 super.onAdLoaded();
@@ -336,7 +352,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+
         @Override
-        public int getItemCount() { return categoriesModelArrayList.size(); }
+        public int getItemCount() {
+            return categoriesModelArrayList.size();
+        }
     }
 }

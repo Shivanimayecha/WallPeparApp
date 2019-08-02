@@ -5,6 +5,7 @@
     android:id="@+id/drawerlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background"
     tools:context=".activity.MainActivity">
 
     <LinearLayout
@@ -15,22 +16,25 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            app:title="WallPepars"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:titleTextColor="@color/white">
+            android:layout_height="wrap_content" />
 
-        </androidx.appcompat.widget.Toolbar>
+
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
-
+        <!--<com.github.silvestrpredko.dotprogressbar.DotProgressBar
+            android:id="@+id/dot_progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            app:endColor="@color/colorPrimary"
+            app:startColor="@color/colorPrimary" />
+-->
         <com.google.android.gms.ads.AdView
             android:id="@+id/ad_View"
             android:layout_width="match_parent"
@@ -39,21 +43,76 @@
             app:adSize="BANNER"
             app:adUnitId="ca-app-pub-3940256099942544/6300978111" />
 
-
     </LinearLayout>
 
 
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation_view"
-        android:layout_height="match_parent"
         android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:itemIconTint="#000000"
         android:itemTextAppearance="@style/RobotoTextViewStyle"
-        app:menu="@menu/menu_items"
-        app:headerLayout="@layout/nav_header_layout"/>
+        app:headerLayout="@layout/nav_header_layout"
+        app:itemIconTint="#000000"
+        app:menu="@menu/menu_items">
 
+
+        <View
+            android:id="@+id/v1"
+            android:layout_width="230dp"
+            android:layout_height="2dp"
+            android:layout_marginLeft="20dp"
+            android:layout_below="@layout/nav_header_layout"
+            android:layout_marginTop="245dp"
+            android:background="#CCC5C5" />
+
+        <View
+            android:id="@+id/v2"
+            android:layout_width="230dp"
+            android:layout_height="2dp"
+            android:layout_marginLeft="20dp"
+            android:layout_below="@layout/nav_header_layout"
+            android:layout_marginTop="290dp"
+            android:background="#CCC5C5" />
+
+        <View
+            android:id="@+id/v3"
+            android:layout_width="230dp"
+            android:layout_height="2dp"
+            android:layout_marginLeft="20dp"
+            android:layout_below="@layout/nav_header_layout"
+            android:layout_marginTop="340dp"
+            android:background="#CCC5C5" />
+
+        <View
+            android:id="@+id/v4"
+            android:layout_width="230dp"
+            android:layout_height="2dp"
+            android:layout_marginLeft="20dp"
+            android:layout_below="@layout/nav_header_layout"
+            android:layout_marginTop="390dp"
+            android:background="#CCC5C5" />
+
+        <View
+            android:id="@+id/v5"
+            android:layout_width="230dp"
+            android:layout_height="2dp"
+            android:layout_marginLeft="20dp"
+            android:layout_below="@layout/nav_header_layout"
+            android:layout_marginTop="435dp"
+            android:background="#CCC5C5" />
+
+        <View
+            android:id="@+id/v6"
+            android:layout_width="230dp"
+            android:layout_height="2dp"
+            android:layout_marginLeft="20dp"
+            android:layout_below="@layout/nav_header_layout"
+            android:layout_marginTop="485dp"
+            android:background="#CCC5C5" />
+
+    </com.google.android.material.navigation.NavigationView>
 
 
 </androidx.drawerlayout.widget.DrawerLayout>

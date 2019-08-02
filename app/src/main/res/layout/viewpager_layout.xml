@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
@@ -15,8 +16,8 @@
         android:layout_width="100dp"
         android:layout_height="20sp"
         android:layout_centerInParent="true"
-        app:endColor="@color/black"
-        app:startColor="@color/black" />
+        app:endColor="@color/white"
+        app:startColor="@color/white" />
 
 
 </RelativeLayout>

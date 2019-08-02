@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 public class WallPeparsAdapter extends PagerAdapter {
 
+
     Context context;
     ArrayList<WallPepars_Model> wallPepars_modelArrayList = new ArrayList<>();
 

@@ -63,7 +63,7 @@ public class MoreAppsAdapter extends RecyclerView.Adapter<MoreAppsAdapter.ViewHo
     }
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
-        Picasso.get().load(moreApps_modelArrayList.get(position).getAppIcon()).into(holder.appicon);
+        Picasso.with(context).load(moreApps_modelArrayList.get(position).getAppIcon()).into(holder.appicon);
         holder.appname.setText(moreApps_modelArrayList.get(position).getAppName());
         Log.e (TAG, "onBindViewHolder: " + moreApps_modelArrayList.get (position).getAppIcon ());
         holder.applink.setOnClickListener(new View.OnClickListener() {

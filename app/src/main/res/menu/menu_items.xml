@@ -1,27 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
+
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/privacy"
+            android:id="@+id/fvrt"
+            android:title="My Favorite"
+            android:visible="true"
+            android:icon="@drawable/favorite"/>
+        <item
+            android:id="@+id/privacyPolicy"
             android:title="Privacy Policy"
             android:visible="true"
-            android:icon="@drawable/privacypolicy"/>
+            android:icon="@drawable/privacy"/>
         <item
-            android:id="@+id/help"
-            android:title="Help"
+            android:id="@+id/termcondition"
+            android:title="Terms &amp; Condition"
             android:visible="true"
-            android:icon="@drawable/help1"/>
+            android:icon="@drawable/terms"/>
         <item
-            android:id="@+id/apps"
-            android:title="MoreApps"
+            android:id="@+id/moreApps"
             android:visible="true"
-            android:icon="@drawable/profiles1"/>
+            android:title="More Best Apps"
+            android:icon="@drawable/moreapps"/>
+
         <item
-            android:id="@+id/rating"
+            android:id="@+id/shareApp"
             android:visible="true"
-            android:title="Rating"
-            android:icon="@drawable/rating1"/>
+            android:title="Share App"
+            android:icon="@drawable/share"/>
 
         <item
             android:id="@+id/clrcache"
