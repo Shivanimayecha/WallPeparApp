@@ -3,14 +3,19 @@ package com.hd.nature.ghkwallpaper.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -29,7 +34,9 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.material.navigation.NavigationView;
+import com.hd.nature.ghkwallpaper.BuildConfig;
 import com.hd.nature.ghkwallpaper.R;
+import com.hd.nature.ghkwallpaper.comman.DataBaseHelper;
 import com.hd.nature.ghkwallpaper.comman.GlobalApplication;
 import com.hd.nature.ghkwallpaper.comman.NetworkConnection;
 import com.hd.nature.ghkwallpaper.data_models.categoriesModel;
@@ -64,11 +71,12 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //requestWindowFeature(Window.FEATURE_NO_TITLE);
-
         setContentView(R.layout.activity_main);
         activity = MainActivity.this;
 
@@ -97,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (id) {
                     case R.id.fvrt:
+                        Intent i = new Intent(MainActivity.this, FavoriteActivity.class);
+                        startActivity(i);
                         Toast.makeText(getApplicationContext(), "Favorite", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.privacyPolicy:
@@ -106,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Terms & Condition", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.moreApps:
-
                         Intent intent = new Intent(MainActivity.this, MoreAppsActivity.class);
                         startActivity(intent);
                         break;
@@ -120,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         break;*/
                     case R.id.shareApp:
+                        shareApplication();
                         Toast.makeText(getApplicationContext(), "Share App", Toast.LENGTH_SHORT).show();
                         break;
 
@@ -153,6 +163,18 @@ public class MainActivity extends AppCompatActivity {
         };
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+    }
+
+    private void shareApplication() {
+
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "WallPepar Application");
+        String message = "Hey ,Download this app !\n\n";
+        message = message + "https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID + "\n\n";
+        intent.putExtra(Intent.EXTRA_TEXT, message);
+        startActivity(Intent.createChooser(intent, "Choose one"));
+
     }
 
     private void initViews() {
@@ -218,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        clearApplicationData();
+        //clearApplicationData();
         if (adView != null) {
             adView.destroy();
         }
@@ -301,7 +323,18 @@ public class MainActivity extends AppCompatActivity {
                 super(itemView);
 
                 catIamge = itemView.findViewById(R.id.catImage);
-                //  catName = itemView.findViewById(R.id.catName);
+
+                /*ViewTreeObserver vto = catIamge.getViewTreeObserver();
+                vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                    public boolean onPreDraw() {
+                        catIamge.getViewTreeObserver().removeOnPreDrawListener(this);
+                        finalHeight = catIamge.getMeasuredHeight();
+                        finalWidth = catIamge.getMeasuredWidth();
+                        Log.e(TAG, "onPreDraw: "+finalHeight+finalWidth );
+                     //   tv.setText("Height: " + finalHeight + " Width: " + finalWidth);
+                        return true;
+                    }
+                });*/
                 relativeLayout = itemView.findViewById(R.id.rl);
 
             }

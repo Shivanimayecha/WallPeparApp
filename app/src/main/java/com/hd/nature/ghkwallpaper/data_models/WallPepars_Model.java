@@ -15,6 +15,19 @@ public class WallPepars_Model {
     @Expose
     private String categoryId;
 
+    public WallPepars_Model(String id, String image, String categoryId) {
+        this.id = id;
+        this.image = image;
+        this.categoryId = categoryId;
+    }
+
+    public WallPepars_Model() {
+    }
+
+    public WallPepars_Model(String image) {
+        this.image = image;
+    }
+
     public String getId() {
         return id;
     }

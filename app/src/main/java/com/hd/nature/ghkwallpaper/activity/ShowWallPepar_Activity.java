@@ -1,11 +1,17 @@
 package com.hd.nature.ghkwallpaper.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -19,30 +25,39 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+import com.github.silvestrpredko.dotprogressbar.DotProgressBar;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.hd.nature.ghkwallpaper.R;
-import com.hd.nature.ghkwallpaper.adapter.WallPeparsAdapter;
+import com.hd.nature.ghkwallpaper.comman.DataBaseHelper;
 import com.hd.nature.ghkwallpaper.comman.GlobalApplication;
 import com.hd.nature.ghkwallpaper.comman.NetworkConnection;
 import com.hd.nature.ghkwallpaper.data_models.WallPepars_Model;
+import com.hd.nature.ghkwallpaper.data_models.fvrt_model;
 import com.hd.nature.ghkwallpaper.retrofit.ApiService;
 import com.hd.nature.ghkwallpaper.retrofit.RetroClient;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -53,6 +68,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 import retrofit2.Call;
@@ -63,6 +79,9 @@ import static java.security.AccessController.getContext;
 
 public class ShowWallPepar_Activity extends Activity {
 
+    //  private ArrayList<File> al_my_photos = new ArrayList<>();
+
+    ArrayList<fvrt_model> arrayList = new ArrayList<>();
 
     String TAG = "TAG";
     String cat_id;
@@ -71,14 +90,19 @@ public class ShowWallPepar_Activity extends Activity {
     Activity activity;
     WallPeparsAdapter wallPeparsAdapter;
     ArrayList<WallPepars_Model> wallPepars_modelArrayList = new ArrayList<>();
-    ImageButton save,back,favorite;
+    ImageButton save, back;
+    ImageView favorite;
     ImageView share;
     Bitmap bitmap;
     ProgressDialog progressDialog;
     private AdView adView;
     AdRequest adRequest;
+    SQLiteDatabase database;
 
+    ImageView imageView;
 
+    String id = "id";
+    String img = "img";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +110,7 @@ public class ShowWallPepar_Activity extends Activity {
         setContentView(R.layout.activity_show_wallpepar_);
         activity = ShowWallPepar_Activity.this;
 
-
+        database = new DataBaseHelper(getApplicationContext()).getWritableDatabase();
         findViews();
 
         initviews();
@@ -95,10 +119,12 @@ public class ShowWallPepar_Activity extends Activity {
 
     private void findViews() {
         viewPager = findViewById(R.id.viewPager);
+        favorite = findViewById(R.id.btn_fvrt);
         save = findViewById(R.id.btn_download);
         back = findViewById(R.id.btn_back);
         share = findViewById(R.id.btn_share);
         adView = findViewById(R.id.ad_View);
+        //   imageView = findViewById(R.id.imageView);
     }
 
     private void initviews() {
@@ -128,6 +154,7 @@ public class ShowWallPepar_Activity extends Activity {
                             callWallPaperAPI(response.body(), "");
                         }
                     }
+
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
                         Log.e(TAG, "onFailure: ");
@@ -141,16 +168,59 @@ public class ShowWallPepar_Activity extends Activity {
         } else {
             Toast.makeText(activity, "Please check your network connection", Toast.LENGTH_SHORT).show();
         }
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+            public void onPageScrollStateChanged(int state) {
+
+                Log.e(TAG, "onPageScrollStateChanged: ");
+
+                String idd = wallPepars_modelArrayList.get(viewPager.getCurrentItem()).getId();
+                String titlee = wallPepars_modelArrayList.get(viewPager.getCurrentItem()).getImage();
+
+                String qu = "select * from wallpaper";
+
+                Cursor cursor = database.rawQuery(qu, null);
+                int count = cursor.getCount();
+
+                if (count == 0) {
+
+                    Log.e(TAG, "count == 0: ");
+                } else {
+
+                    Log.e(TAG, "count == else: ");
+
+                    while (cursor.moveToNext()) {
+
+                        if (cursor.getString(0).equalsIgnoreCase(idd)) {
+
+                            favorite.setBackgroundResource(R.drawable.fillheart);
+
+                        } else {
+
+                            favorite.setBackgroundResource(R.drawable.blankheart);
+                        }
+                    }
+                }
 
 
+            }
+
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+                Log.e(TAG, "onPageScrolled: " + position);
+
+            }
+
+            public void onPageSelected(int position) {
 
 
-
-
+                Log.e(TAG, "onPageSelected: " + position);
+                // Check if this is the page you want.
+            }
+        });
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
 
                 if (!GlobalApplication.getInstance().requestNewInterstitial()) {
 
@@ -164,10 +234,12 @@ public class ShowWallPepar_Activity extends Activity {
                             GlobalApplication.getInstance().ins_adRequest = null;
                             GlobalApplication.getInstance().LoadAds();
                         }
+
                         @Override
                         public void onAdFailedToLoad(int i) {
                             super.onAdFailedToLoad(i);
                         }
+
                         @Override
                         public void onAdLoaded() {
                             super.onAdLoaded();
@@ -177,15 +249,12 @@ public class ShowWallPepar_Activity extends Activity {
                 new ImageSave().execute();
             }
         });
-
-
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               // onBackPressed();
-
-                Intent intent = new Intent(ShowWallPepar_Activity.this,MainActivity.class);
-                startActivity(intent);
+            /*    Intent intent = new Intent(ShowWallPepar_Activity.this, MainActivity.class);
+                startActivity(intent);*/
+                onBackPressed();
             }
         });
 
@@ -193,60 +262,65 @@ public class ShowWallPepar_Activity extends Activity {
             @Override
             public void onClick(View view) {
 
-                Bitmap bitmap =getBitmapFromView(viewPager);
-                try {
-                    File file = new File(ShowWallPepar_Activity.this.getExternalCacheDir(),"abc.png");
-                    FileOutputStream fOut = new FileOutputStream(file);
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
-                    fOut.flush();
-                    fOut.close();
-                    file.setReadable(true, false);
-                    final Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                   // intent.putExtra(Intent.EXTRA_TEXT, movieName);
-                    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
-                    intent.setType("image/png");
-                    startActivity(Intent.createChooser(intent, "Share image via"));
-                } catch (Exception e) {
-                    e.printStackTrace();
+                new ImageShare().execute();
+            }
+        });
+
+
+        favorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                String idd = wallPepars_modelArrayList.get(viewPager.getCurrentItem()).getId();
+                String titlee = wallPepars_modelArrayList.get(viewPager.getCurrentItem()).getImage();
+
+                String qu = "select * from wallpaper";
+
+                Cursor cursor = database.rawQuery(qu, null);
+                int count = cursor.getCount();
+
+                if (count == 0) {
+
+                    favorite.setBackgroundResource(R.drawable.fillheart);
+                    String ROW1 = "INSERT INTO " + "wallpaper" + " (" + id + "," + img + ") Values ('" + idd + "', '" + titlee + "')";
+                    database.execSQL(ROW1);
+
+                    Log.e(TAG, "onClick: cursor null");
+
+                } else {
+
+                    while (cursor.moveToNext()) {
+
+                        Log.e("Data", cursor.getColumnName(0) + " : " + cursor.getString(0) + ", "
+                                + cursor.getColumnName(1) + " : " + cursor.getString(1) + ", ");
+
+                        Log.e(TAG, "cursor-->: " + cursor.getString(0));
+                        Log.e(TAG, "idd--> " + idd);
+                        if (cursor.getString(0).equalsIgnoreCase(idd)) {
+
+                            Log.e(TAG, "onClick:if ");
+                            String del = "DELETE FROM " + "wallpaper" + " WHERE " + id + "='" + idd + "'";
+                            database.execSQL(del);
+
+                            favorite.setBackgroundResource(R.drawable.blankheart);
+
+                        } else {
+
+                            Log.e(TAG, "onClick:else ");
+                            String ROW1 = "INSERT INTO " + "wallpaper" + " (" + id + "," + img + ") Values ('" + idd + "', '" + titlee + "')";
+                            database.execSQL(ROW1);
+
+                            favorite.setBackgroundResource(R.drawable.fillheart);
+                        }
+                    }
+                    //Toast.makeText(ShowWallPepar_Activity.this, "Successfully added in to favorite !", Toast.LENGTH_SHORT).show();
+
                 }
-
-
-             /*   Intent share = new Intent(Intent.ACTION_SEND);
-
-                // If you want to share a png image only, you can do:
-                // setType("image/png"); OR for jpeg: setType("image/jpeg");
-                share.setType("image/*");
-
-                // Make sure you put example png image named myImage.png in your
-                // directory
-                String imagePath = Environment.getExternalStorageDirectory()
-                        + "/myImage.png";
-
-                File imageFileToShare = new File(imagePath);
-
-                Uri uri = Uri.fromFile(imageFileToShare);
-                share.putExtra(Intent.EXTRA_STREAM, uri);
-
-                startActivity(Intent.createChooser(share, "Share Image!"));*/
 
 
             }
         });
-    }
-
-    private Bitmap getBitmapFromView(ViewPager viewPager) {
-        Bitmap returnedBitmap = Bitmap.createBitmap(viewPager.getWidth(), viewPager.getHeight(),Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(returnedBitmap);
-        Drawable bgDrawable =viewPager.getBackground();
-        if (bgDrawable!=null) {
-            bgDrawable.draw(canvas);
-        }   else{
-            canvas.drawColor(Color.WHITE);
-        }
-        viewPager.draw(canvas);
-        return returnedBitmap;
-
     }
 
 
@@ -276,6 +350,38 @@ public class ShowWallPepar_Activity extends Activity {
             e.printStackTrace();
         }
 
+    }
+
+    private class ImageShare extends AsyncTask<Void, Void, Void> {
+
+        //Bitmap mbitmap;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+         /*   onProgressBar();
+            Log.e(TAG, "onPreExecute: ");*/
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            getPhotos();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            hideProgressBar();
+            String bitmapPath = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "title", null);
+            Uri bitmapUri = Uri.parse(bitmapPath);
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("image/png");
+            intent.putExtra(Intent.EXTRA_STREAM, bitmapUri);
+            startActivity(Intent.createChooser(intent, "Share"));
+
+        }
     }
 
     private class ImageSave extends AsyncTask<Void, Void, Void> {
@@ -403,14 +509,6 @@ public class ShowWallPepar_Activity extends Activity {
         }
     }
 
-  /*  @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish ();
-        Runtime.getRuntime ().gc ();
-        System.gc ();
-    }*/
-
     @Override
     protected void onPause() {
 
@@ -436,4 +534,73 @@ public class ShowWallPepar_Activity extends Activity {
         }
         super.onDestroy();
     }
+
+
+    public class WallPeparsAdapter extends PagerAdapter {
+
+
+        Context context;
+        public ArrayList<WallPepars_Model> wallPepars_modelArrayList = new ArrayList<>();
+
+        public WallPeparsAdapter(Context context, ArrayList<WallPepars_Model> wallPepars_modelArrayList) {
+            this.context = context;
+            this.wallPepars_modelArrayList = wallPepars_modelArrayList;
+        }
+
+        @NonNull
+        @Override
+        public Object instantiateItem(@NonNull ViewGroup container, int position) {
+
+            LayoutInflater inflater = LayoutInflater.from(container.getContext());
+            View view = inflater.inflate(R.layout.viewpager_layout, container, false);
+
+            ((ViewPager) container).addView(view);
+            ImageView imag = (ImageView) view.findViewById(R.id.imageView);
+
+            final DotProgressBar dotProgressBar = view.findViewById(R.id.dot_progress_bar);
+            dotProgressBar.setVisibility(View.VISIBLE);
+            //dotsLoaderView = view.findViewById(R.id.dotsLoader);
+            //dotsLoaderView.setVisibility(View.VISIBLE);
+            // dotsLoaderView.show();
+
+            Log.e("TAG", "instantiateItem: " + wallPepars_modelArrayList.get(position).getImage());
+
+            Glide.with(context)
+                    .load(wallPepars_modelArrayList.get(position).getImage())
+                    .listener(new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFirstResource) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            dotProgressBar.setVisibility(View.GONE);
+
+                      /* dotsLoaderView.setVisibility(View.GONE);
+                        dotsLoaderView.hide();*/
+                            return false;
+                        }
+                    })
+                    .into(imag);
+            return view;
+
+        }
+
+        @Override
+        public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+            container.removeView((View) object);
+        }
+
+        @Override
+        public int getCount() {
+            return wallPepars_modelArrayList.size();
+        }
+
+        @Override
+        public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
+            return view == object;
+        }
+    }
+
 }
