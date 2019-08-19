@@ -1,11 +1,8 @@
 package com.hd.nature.ghkwallpaper.activity;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -14,10 +11,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -28,12 +21,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
@@ -47,41 +36,27 @@ import com.hd.nature.ghkwallpaper.comman.DataBaseHelper;
 import com.hd.nature.ghkwallpaper.comman.GlobalApplication;
 import com.hd.nature.ghkwallpaper.comman.NetworkConnection;
 import com.hd.nature.ghkwallpaper.data_models.WallPepars_Model;
-import com.hd.nature.ghkwallpaper.data_models.fvrt_model;
 import com.hd.nature.ghkwallpaper.retrofit.ApiService;
 import com.hd.nature.ghkwallpaper.retrofit.RetroClient;
-import com.squareup.picasso.Picasso;
-
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static java.security.AccessController.getContext;
 
 public class ShowWallPepar_Activity extends Activity {
-
-    //  private ArrayList<File> al_my_photos = new ArrayList<>();
-
-    ArrayList<fvrt_model> arrayList = new ArrayList<>();
 
     String TAG = "TAG";
     String cat_id;
@@ -90,31 +65,28 @@ public class ShowWallPepar_Activity extends Activity {
     Activity activity;
     WallPeparsAdapter wallPeparsAdapter;
     ArrayList<WallPepars_Model> wallPepars_modelArrayList = new ArrayList<>();
-    ImageButton save, back;
-    ImageView favorite;
-    ImageView share;
+    ArrayList<String> arrayList1 = new ArrayList<>();
+    public static ImageView favorite,share, save;
+    ImageView back;
     Bitmap bitmap;
     ProgressDialog progressDialog;
     private AdView adView;
     AdRequest adRequest;
     SQLiteDatabase database;
-
-    ImageView imageView;
-
     String id = "id";
     String img = "img";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_wallpepar_);
         activity = ShowWallPepar_Activity.this;
-
         database = new DataBaseHelper(getApplicationContext()).getWritableDatabase();
+
         findViews();
 
         initviews();
-
     }
 
     private void findViews() {
@@ -124,18 +96,18 @@ public class ShowWallPepar_Activity extends Activity {
         back = findViewById(R.id.btn_back);
         share = findViewById(R.id.btn_share);
         adView = findViewById(R.id.ad_View);
-        //   imageView = findViewById(R.id.imageView);
     }
 
     private void initviews() {
 
+        favorite.setEnabled(false);
+        share.setEnabled(false);
+        save.setEnabled(false);
+
         adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
-
-
         cat_id = getIntent().getStringExtra("cat_id");
         idd = Integer.parseInt(cat_id);
-        Log.e(TAG, "onCreate: " + idd);
 
         if (NetworkConnection.isNetworkAvailable(activity)) {
             try {
@@ -147,7 +119,6 @@ public class ShowWallPepar_Activity extends Activity {
                     @Override
                     public void onResponse(Call<String> call, Response<String> response) {
 
-                        // Toast.makeText(ShowWallPepar_Activity.this, "hiii", Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "onResponseWallpepar: " + response.body());
 
                         if (response.body() != null) {
@@ -168,56 +139,66 @@ public class ShowWallPepar_Activity extends Activity {
         } else {
             Toast.makeText(activity, "Please check your network connection", Toast.LENGTH_SHORT).show();
         }
+
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
             public void onPageScrollStateChanged(int state) {
 
-                Log.e(TAG, "onPageScrollStateChanged: ");
+                /*favorite.setEnabled(false);
+                share.setEnabled(false);
+                save.setEnabled(false);*/
+                Log.e(TAG, "onCreate: " + idd);
+                String iid = wallPepars_modelArrayList.get(viewPager.getCurrentItem()).getId();
 
-                String idd = wallPepars_modelArrayList.get(viewPager.getCurrentItem()).getId();
-                String titlee = wallPepars_modelArrayList.get(viewPager.getCurrentItem()).getImage();
+                Log.e(TAG, "wallpepar id : " + iid);
 
                 String qu = "select * from wallpaper";
 
                 Cursor cursor = database.rawQuery(qu, null);
                 int count = cursor.getCount();
+                Log.e(TAG, "onPageScrollStateChanged: count" + count);
 
                 if (count == 0) {
 
                     Log.e(TAG, "count == 0: ");
+                    // favorite.setBackgroundResource(R.drawable.fillheart);
+
                 } else {
+                    //  Cursor cursor1 = database.query("wallpaper", null, null, null, null, null, null);
+                    // Log.e(TAG, "callWallPaperAPI: cursor1 " + cursor1);
 
-                    Log.e(TAG, "count == else: ");
-
-                    while (cursor.moveToNext()) {
-
-                        if (cursor.getString(0).equalsIgnoreCase(idd)) {
-
-                            favorite.setBackgroundResource(R.drawable.fillheart);
-
-                        } else {
-
-                            favorite.setBackgroundResource(R.drawable.blankheart);
+                    if (cursor != null) {
+                        while (cursor.moveToNext()) {
+                            Log.e("Data", cursor.getColumnName(0) + " : " + cursor.getString(0) + ", "
+                                    + cursor.getColumnName(1) + " : " + cursor.getString(1) + ", ");
+                            arrayList1.add(cursor.getString(0));
+                            Log.e(TAG, "onPageScrollStateChanged: arraylist1 " + arrayList1);
                         }
                     }
+                    if (arrayList1.contains(iid)) {
+
+                        Log.e(TAG, "contains: if");
+
+                        // Toast.makeText(activity, "already in fvrtlist", Toast.LENGTH_SHORT).show();
+                        favorite.setBackgroundResource(R.drawable.fillheart);
+
+
+                    } else {
+                        Log.e(TAG, "not contains: else");
+                        // Toast.makeText(activity, "not in fvrtlist", Toast.LENGTH_SHORT).show();
+
+                        favorite.setBackgroundResource(R.drawable.blankheart);
+                    }
                 }
-
-
             }
 
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-                Log.e(TAG, "onPageScrolled: " + position);
-
             }
 
             public void onPageSelected(int position) {
-
-
-                Log.e(TAG, "onPageSelected: " + position);
-                // Check if this is the page you want.
             }
         });
+
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -249,6 +230,8 @@ public class ShowWallPepar_Activity extends Activity {
                 new ImageSave().execute();
             }
         });
+
+
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -257,6 +240,7 @@ public class ShowWallPepar_Activity extends Activity {
                 onBackPressed();
             }
         });
+
 
         share.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -271,63 +255,151 @@ public class ShowWallPepar_Activity extends Activity {
             @Override
             public void onClick(View view) {
 
-
                 String idd = wallPepars_modelArrayList.get(viewPager.getCurrentItem()).getId();
                 String titlee = wallPepars_modelArrayList.get(viewPager.getCurrentItem()).getImage();
 
-                String qu = "select * from wallpaper";
-
+                //String qu = "select * from wallpaper";
+                String qu = "SELECT count(*) FROM wallpaper";
                 Cursor cursor = database.rawQuery(qu, null);
-                int count = cursor.getCount();
+                cursor.moveToFirst();
+                int count = cursor.getInt(0);
+
+                Log.e(TAG, "onClick: count-->" + count);
 
                 if (count == 0) {
 
-                    favorite.setBackgroundResource(R.drawable.fillheart);
-                    String ROW1 = "INSERT INTO " + "wallpaper" + " (" + id + "," + img + ") Values ('" + idd + "', '" + titlee + "')";
-                    database.execSQL(ROW1);
+                    new insertData().execute();
 
-                    Log.e(TAG, "onClick: cursor null");
-
+                    // Toast.makeText(ShowWallPepar_Activity.this, "Successfully added in to favorite !", Toast.LENGTH_SHORT).show();
+                    /*String ROW1 = "INSERT INTO " + "wallpaper" + " (" + id + "," + img + ") Values ('" + idd + "', '" + titlee + "')";
+                    database.execSQL(ROW1);*/
                 } else {
+                    Log.e(TAG, "onClick: not empty");
+                  /*  Cursor cursor1 = database.query("wallpaper", null, null, null, null, null, null);
 
-                    while (cursor.moveToNext()) {
-
-                        Log.e("Data", cursor.getColumnName(0) + " : " + cursor.getString(0) + ", "
-                                + cursor.getColumnName(1) + " : " + cursor.getString(1) + ", ");
-
-                        Log.e(TAG, "cursor-->: " + cursor.getString(0));
-                        Log.e(TAG, "idd--> " + idd);
-                        if (cursor.getString(0).equalsIgnoreCase(idd)) {
-
-                            Log.e(TAG, "onClick:if ");
-                            String del = "DELETE FROM " + "wallpaper" + " WHERE " + id + "='" + idd + "'";
-                            database.execSQL(del);
-
-                            favorite.setBackgroundResource(R.drawable.blankheart);
-
-                        } else {
-
-                            Log.e(TAG, "onClick:else ");
-                            String ROW1 = "INSERT INTO " + "wallpaper" + " (" + id + "," + img + ") Values ('" + idd + "', '" + titlee + "')";
-                            database.execSQL(ROW1);
-
-                            favorite.setBackgroundResource(R.drawable.fillheart);
+                    if (cursor1 != null) {
+                        while (cursor1.moveToNext()) {
+                            Log.e("Data", cursor1.getColumnName(0) + " : " + cursor1.getString(0) + ", "
+                                    + cursor1.getColumnName(1) + " : " + cursor1.getString(1) + ", ");
+                            arrayList1.add(cursor1.getString(0));
+                            Log.e(TAG, "onClick: of fvrt" + arrayList1);
+                            //
                         }
+                    }*/
+                    if (arrayList1.contains(idd)) {
+
+                        new deletetData().execute();
+
+                    } else {
+
+                        new insertData().execute();
                     }
-                    //Toast.makeText(ShowWallPepar_Activity.this, "Successfully added in to favorite !", Toast.LENGTH_SHORT).show();
-
                 }
-
-
             }
         });
     }
 
+    public class insertData extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            callData();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            favorite.setBackgroundResource(R.drawable.fillheart);
+            // hideProgressBar();
+
+        }
+    }
+
+    private void callData() {
+
+        String idd = wallPepars_modelArrayList.get(viewPager.getCurrentItem()).getId();
+        String titlee = wallPepars_modelArrayList.get(viewPager.getCurrentItem()).getImage();
+
+        String ROW1 = "INSERT INTO " + "wallpaper" + " (" + id + "," + img + ") Values ('" + idd + "', '" + titlee + "')";
+        database.execSQL(ROW1);
+
+        Log.e(TAG, "callData: before arraylist clear" + arrayList1);
+
+        arrayList1.clear();
+
+        Log.e(TAG, "callData: after arraylist clear" + arrayList1);
+
+        String qu = "select * from wallpaper";
+
+        Cursor cursor = database.rawQuery(qu, null);
+        //int count = cursor.getCount();
+        // Cursor cursor1 = database.query("wallpaper", null, null, null, null, null, null);
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                Log.e("Data", cursor.getColumnName(0) + " : " + cursor.getString(0) + ", "
+                        + cursor.getColumnName(1) + " : " + cursor.getString(1) + ", ");
+                arrayList1.add(cursor.getString(0));
+                Log.e(TAG, "calldata: arraylist1" + arrayList1);
+            }
+        }
+    }
+
+    public class deletetData extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            deletData();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            favorite.setBackgroundResource(R.drawable.blankheart);
+        }
+    }
+
+    private void deletData() {
+
+        String idd = wallPepars_modelArrayList.get(viewPager.getCurrentItem()).getId();
+
+        Log.e(TAG, "contains: ");
+
+        String del = "DELETE FROM " + "wallpaper" + " WHERE " + id + "='" + idd + "'";
+        database.execSQL(del);
+
+        Log.e(TAG, "deletData: before arraylist clear " + arrayList1);
+
+        arrayList1.clear();
+
+        Log.e(TAG, "deletData: after arraylist clear " + arrayList1);
+
+        String qu = "select * from wallpaper";
+
+        Cursor cursor = database.rawQuery(qu, null);
+        int count = cursor.getCount();
+
+        Log.e(TAG, "deletData:count--> " + count);
+    }
 
     private void callWallPaperAPI(String body, String s) {
         try {
 
-            wallPepars_modelArrayList.clear();
+            // wallPepars_modelArrayList.clear();
 
             JSONArray jsonArray = new JSONArray(body);
 
@@ -346,6 +418,55 @@ public class ShowWallPepar_Activity extends Activity {
             wallPeparsAdapter = new WallPeparsAdapter(ShowWallPepar_Activity.this, wallPepars_modelArrayList);
             viewPager.setAdapter(wallPeparsAdapter);
 
+           /* favorite.setEnabled(false);
+            share.setEnabled(false);
+            save.setEnabled(false);*/
+
+            Log.e(TAG, "onCreate: " + idd);
+
+            String iid = wallPepars_modelArrayList.get(viewPager.getCurrentItem()).getId();
+
+            Log.e(TAG, "callWallPaperAPI: iid " + iid);
+
+            String qu = "select * from wallpaper";
+
+            Cursor cursor = database.rawQuery(qu, null);
+            int count = cursor.getCount();
+            Log.e(TAG, "callWallPaperAPI : count" + count);
+
+            if (count == 0) {
+
+                Log.e(TAG, "count == 0: ");
+                // favorite.setBackgroundResource(R.drawable.fillheart);
+
+            } else {
+                //Cursor cursor1 = database.query("wallpaper", null, null, null, null, null, null);
+
+                if (cursor != null) {
+                    while (cursor.moveToNext()) {
+                        Log.e("Data", cursor.getColumnName(0) + " : " + cursor.getString(0) + ", "
+                                + cursor.getColumnName(1) + " : " + cursor.getString(1) + ", ");
+                        arrayList1.add(cursor.getString(0));
+                        Log.e(TAG, "callWallPaperAPI: arraylist1 " + arrayList1);
+                    }
+                }
+                if (arrayList1.contains(iid)) {
+
+                    Log.e(TAG, "contains: if");
+
+                  //  Toast.makeText(activity, "already in fvrtlist", Toast.LENGTH_SHORT).show();
+                    favorite.setBackgroundResource(R.drawable.fillheart);
+
+                } else {
+
+                    Log.e(TAG, "not contains: else");
+                    //Toast.makeText(activity, "not in fvrtlist", Toast.LENGTH_SHORT).show();
+
+                    favorite.setBackgroundResource(R.drawable.blankheart);
+
+                }
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -354,13 +475,11 @@ public class ShowWallPepar_Activity extends Activity {
 
     private class ImageShare extends AsyncTask<Void, Void, Void> {
 
-        //Bitmap mbitmap;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-         /*   onProgressBar();
-            Log.e(TAG, "onPreExecute: ");*/
+            //  onProgressBar();
         }
 
         @Override
@@ -521,9 +640,9 @@ public class ShowWallPepar_Activity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (adView != null) {
+        /*if (adView != null) {
             adView.resume();
-        }
+        }*/
     }
 
     @Override
@@ -545,6 +664,7 @@ public class ShowWallPepar_Activity extends Activity {
         public WallPeparsAdapter(Context context, ArrayList<WallPepars_Model> wallPepars_modelArrayList) {
             this.context = context;
             this.wallPepars_modelArrayList = wallPepars_modelArrayList;
+
         }
 
         @NonNull
@@ -569,13 +689,19 @@ public class ShowWallPepar_Activity extends Activity {
                     .load(wallPepars_modelArrayList.get(position).getImage())
                     .listener(new RequestListener<String, GlideDrawable>() {
                         @Override
-                        public boolean onException(Exception e, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFirstResource) {
+                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+
                             return false;
                         }
 
                         @Override
                         public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+
                             dotProgressBar.setVisibility(View.GONE);
+
+                            favorite.setEnabled(true);
+                            share.setEnabled(true);
+                            save.setEnabled(true);
 
                       /* dotsLoaderView.setVisibility(View.GONE);
                         dotsLoaderView.hide();*/
@@ -583,6 +709,8 @@ public class ShowWallPepar_Activity extends Activity {
                         }
                     })
                     .into(imag);
+
+
             return view;
 
         }

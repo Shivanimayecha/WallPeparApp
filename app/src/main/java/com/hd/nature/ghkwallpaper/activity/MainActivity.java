@@ -1,7 +1,9 @@
 package com.hd.nature.ghkwallpaper.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -29,6 +31,11 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+import com.github.silvestrpredko.dotprogressbar.DotProgressBar;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -61,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     Activity activity;
     private AdView adView;
     AdRequest adRequest;
+    DotProgressBar dotProgressBar;
     //InterstitialAd interstitialAd;
 
 
@@ -70,8 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
-
-
+    AlertDialog.Builder builder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,9 +99,12 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adView = findViewById(R.id.ad_View);
+        dotProgressBar =findViewById(R.id.dot_progress_bar2);
     }
 
     private void initNavigationDrawer() {
+
+
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -107,13 +117,13 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.fvrt:
                         Intent i = new Intent(MainActivity.this, FavoriteActivity.class);
                         startActivity(i);
-                        Toast.makeText(getApplicationContext(), "Favorite", Toast.LENGTH_SHORT).show();
+                        //  Toast.makeText(getApplicationContext(), "Favorite", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.privacyPolicy:
-                        Toast.makeText(getApplicationContext(), "Privacy Policy", Toast.LENGTH_SHORT).show();
+                        //  Toast.makeText(getApplicationContext(), "Privacy Policy", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.termcondition:
-                        Toast.makeText(getApplicationContext(), "Terms & Condition", Toast.LENGTH_SHORT).show();
+                        //   Toast.makeText(getApplicationContext(), "Terms & Condition", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.moreApps:
                         Intent intent = new Intent(MainActivity.this, MoreAppsActivity.class);
@@ -130,12 +140,16 @@ public class MainActivity extends AppCompatActivity {
                         break;*/
                     case R.id.shareApp:
                         shareApplication();
-                        Toast.makeText(getApplicationContext(), "Share App", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(), "Share App", Toast.LENGTH_SHORT).show();
                         break;
 
                     case R.id.clrcache:
-                        clearApplicationData();
-                        Toast.makeText(MainActivity.this, "Cache Data is clear !", Toast.LENGTH_SHORT).show();
+
+                        AlertClearCache();
+                    /*
+                        "clear cache";
+                                "your favorite list and cache data will be clear ..are you sure?";*/
+
                         break;
                 }
                 return true;
@@ -165,6 +179,33 @@ public class MainActivity extends AppCompatActivity {
         actionBarDrawerToggle.syncState();
     }
 
+    private void AlertClearCache() {
+
+        builder.setMessage("Your Favorite List And Cache Data Will Be Clear...Are you sure?")
+                .setCancelable(false)
+                .setPositiveButton("YES",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        clearApplicationData();
+                        Toast.makeText(MainActivity.this, "Cache Data is clear !", Toast.LENGTH_SHORT).show();
+
+                       /*     Toast.makeText(getApplicationContext(),"you choose yes action for alertbox",
+                                    Toast.LENGTH_SHORT).show();*/
+                    }
+                });
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        //Setting the title manually
+        alert.setTitle("Clear Cache");
+        alert.show();
+
+    }
+
     private void shareApplication() {
 
         Intent intent = new Intent(Intent.ACTION_SEND);
@@ -179,6 +220,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void initViews() {
 
+        dotProgressBar.setVisibility(View.VISIBLE);
+        builder = new AlertDialog.Builder(this);
         adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
         if (NetworkConnection.isNetworkAvailable(activity)) {
@@ -232,6 +275,7 @@ public class MainActivity extends AppCompatActivity {
             }
             categoriesAdapter = new CategoriesAdapter(MainActivity.this, categoriesModelArrayList);
             recyclerView.setAdapter(categoriesAdapter);
+            dotProgressBar.setVisibility(View.GONE);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -299,6 +343,7 @@ public class MainActivity extends AppCompatActivity {
         String TAG = "TAG";
         private Context context;
 
+
         public CategoriesAdapter(Context context, ArrayList<categoriesModel> categoriesModelArrayList) {
             this.categoriesModelArrayList = categoriesModelArrayList;
             this.context = context;
@@ -337,13 +382,36 @@ public class MainActivity extends AppCompatActivity {
                 });*/
                 relativeLayout = itemView.findViewById(R.id.rl);
 
+
             }
         }
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
 
-            Picasso.with(context).load(categoriesModelArrayList.get(position).getCategoryImage()).into(holder.catIamge);
+
+         /*   Picasso.with(context)
+                    .load(categoriesModelArrayList.get(position).getCategoryImage())
+                    .into(holder.catIamge);*/
+            Glide.with(context)
+                    .load(categoriesModelArrayList.get(position).getCategoryImage())
+                   /* .listener(new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            dotProgressBar.setVisibility(View.GONE);
+
+                            return false;
+                        }
+                    })*/
+                    .into(holder.catIamge);
+
+
+
             //  holder.catName.setText(categoriesModelArrayList.get(position).getCategories());
             holder.relativeLayout.setOnClickListener(new View.OnClickListener() {
 

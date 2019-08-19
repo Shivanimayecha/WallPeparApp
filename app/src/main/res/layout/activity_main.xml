@@ -24,14 +24,14 @@
             android:layout_height="match_parent"
             android:layout_weight="1" />
 
-        <!--<com.github.silvestrpredko.dotprogressbar.DotProgressBar
-            android:id="@+id/dot_progress_bar"
-            android:layout_width="match_parent"
+        <com.github.silvestrpredko.dotprogressbar.DotProgressBar
+            android:id="@+id/dot_progress_bar2"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            app:endColor="@color/colorPrimary"
-            app:startColor="@color/colorPrimary" />
--->
+            android:layout_gravity="center_horizontal"
+            app:endColor="@color/White"
+            app:startColor="@color/White" />
+
         <com.google.android.gms.ads.AdView
             android:id="@+id/ad_View"
             android:layout_width="match_parent"

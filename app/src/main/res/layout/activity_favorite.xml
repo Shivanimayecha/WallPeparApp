@@ -11,4 +11,49 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/back_btn"
+        android:layout_margin="5dp"
+        android:background="@drawable/backarrowshade"/>
+
+    <ImageView
+        android:layout_width="75dp"
+        android:layout_height="70dp"
+        android:id="@+id/share_btn"
+        android:background="@drawable/sharebtn"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="80dp"
+        android:layout_marginBottom="50dp"/>
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="90dp"
+        android:id="@+id/fvrt_btn"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/fillheart"
+        android:layout_marginBottom="50dp" />
+
+    <ImageView
+        android:layout_width="75dp"
+        android:layout_height="70dp"
+        android:id="@+id/download_btn"
+        android:background="@drawable/savebtn"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="80dp"
+        android:layout_marginBottom="50dp"/>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/ad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        app:adSize="BANNER"
+        app:adUnitId="ca-app-pub-3940256099942544/6300978111" />
+
+
 </RelativeLayout>

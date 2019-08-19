@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.hd.nature.ghkwallpaper.R;
@@ -33,6 +35,7 @@ public class MoreAppsActivity extends AppCompatActivity {
     MoreAppsAdapter moreAppsAdapter;
     Activity activity;
     String TAG = "TAG";
+    ImageView back;
 
 
     @Override
@@ -48,6 +51,7 @@ public class MoreAppsActivity extends AppCompatActivity {
     }
 
     private void findViews() {
+        back = findViewById(R.id.backbtn);
         recyclerView = findViewById(R.id.recyclerMoreApps);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -86,6 +90,15 @@ public class MoreAppsActivity extends AppCompatActivity {
         } else {
             Toast.makeText(MoreAppsActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
         }
+
+
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                onBackPressed();
+            }
+        });
     }
 
     private void parseResponse(String body, String s) {

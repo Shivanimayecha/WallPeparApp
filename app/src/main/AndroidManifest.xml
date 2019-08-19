@@ -24,7 +24,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.ShowWallPepar_Activity" />
+        <activity android:name=".activity.ShowWallPepar_Activity"
+            android:noHistory="true"
+            />
+
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.MoreAppsActivity" />
     </application>
